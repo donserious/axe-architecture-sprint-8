@@ -6,6 +6,8 @@ const ReportPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+
+
   const downloadReport = async () => {
     if (!keycloak?.token) {
       setError('Not authenticated');
@@ -38,7 +40,10 @@ const ReportPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <button
-          onClick={() => keycloak.login()}
+          onClick={() => keycloak.init({
+            onLoad: 'login-required',
+            pkceMethod: 'S256',
+          })}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Login

@@ -36,7 +36,18 @@ services:
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:8000
+      REACT_APP_API_URL: http://localhost:9090
       REACT_APP_KEYCLOAK_URL: http://localhost:8080
       REACT_APP_KEYCLOAK_REALM: reports-realm
       REACT_APP_KEYCLOAK_CLIENT_ID: reports-frontend
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    environment:
+      PYTHON_APP_KEYCLOAK_URL: http://localhost:8080
+      PYTHON_APP_KEYCLOAK_REALM: reports-realm
+      PYTHON_APP_KEYCLOAK_CLIENT_ID: reports-api
+      PYTHON_APP_KEYCLOAK_SECRET_KEY: oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq
