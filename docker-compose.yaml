@@ -11,7 +11,10 @@ services:
       - ./postgres-keycloak-data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
+    networks:
+      - my-network
   keycloak:
+    container_name: keycloak-sso
     image: quay.io/keycloak/keycloak:21.1
     environment:
       KEYCLOAK_ADMIN: admin
@@ -29,7 +32,10 @@ services:
       - "8080:8080"
     depends_on:
       - keycloak_db
+    networks:
+      - my-network
   frontend:
+    container_name: front
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -40,6 +46,8 @@ services:
       REACT_APP_KEYCLOAK_URL: http://localhost:8080
       REACT_APP_KEYCLOAK_REALM: reports-realm
       REACT_APP_KEYCLOAK_CLIENT_ID: reports-frontend
+    networks:
+      - my-network  
   api:
     build:
       context: ./api
@@ -47,7 +55,12 @@ services:
     ports:
       - "9090:9090"
     environment:
-      PYTHON_APP_KEYCLOAK_URL: http://localhost:8080
+      PYTHON_APP_KEYCLOAK_URL: http://keycloak-sso:8080/
       PYTHON_APP_KEYCLOAK_REALM: reports-realm
       PYTHON_APP_KEYCLOAK_CLIENT_ID: reports-api
-      PYTHON_APP_KEYCLOAK_SECRET_KEY: oNwoLQdvJAvRcL89SydqCWCe5ry1jMgq
+      PYTHON_APP_KEYCLOAK_SECRET_KEY: Bn0nRbCGBZeJrWyipUXCkdKG5x3BObaJ
+    networks:
+      - my-network
+networks:
+  my-network:
+    driver: bridge

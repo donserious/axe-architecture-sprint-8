@@ -7,6 +7,7 @@ import logging
 import os
 from keycloak import KeycloakOpenID
 
+
 app = Flask(__name__)
 CORS(app)
 
@@ -16,19 +17,20 @@ logger = logging.getLogger(__name__)
 access_role = 'prothetic_user'
 
 def check_token(token):
-    keycloak_openid = KeycloakOpenID(server_url=os.getenv('PYTHON_APP_KEYCLOAK_URL'),
-                                 client_id=os.getenv('PYTHON_APP_KEYCLOAK_CLIENT_ID'),
-                                 realm_name=os.getenv('PYTHON_APP_KEYCLOAK_REALM'),
-                                 client_secret_key=os.getenv('PYTHON_APP_KEYCLOAK_SECRET_KEY'))
+    keycloak_openid = KeycloakOpenID(#server_url=os.getenv('PYTHON_APP_KEYCLOAK_URL')+'/auth/',
+                                server_url=str(os.getenv('PYTHON_APP_KEYCLOAK_URL')),
+                                #server_url="http://0.0.0.0:8080/",
+                                 client_id=str(os.getenv('PYTHON_APP_KEYCLOAK_CLIENT_ID')),
+                                 realm_name=str(os.getenv('PYTHON_APP_KEYCLOAK_REALM')),
+                                 client_secret_key=str(os.getenv('PYTHON_APP_KEYCLOAK_SECRET_KEY')))
     try:
-        token_info = keycloak_openid.introspect(token)
+        token_info = keycloak_openid.decode_token(token)
     except Exception as e:
         logger.info(f'Error with token {e}')
         return False
+    logger.info(str(token_info))
     roles = token_info['realm_access']['roles']
-    status = token_info['active']
-    logger.info(f'Token {str(status)} from user with role {str(roles)}')
-    if access_role in roles and status:
+    if access_role in roles:
         logger.info('Good role')
         return True
     logger.info('Bad Role')    
